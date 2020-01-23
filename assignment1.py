@@ -25,6 +25,7 @@ products = openFile("products.txt")
 suppliers = openFile("suppliers.txt")
 availability = openFile("availability.txt")
 onshelves = openFile("onshelves.txt")
+costs = []
 
 ## -- Although I could have loaded them all in at once I believe it's easier for me to keep track of things by seperating them like this, that is the only reason why I did this. -- ##
 
@@ -94,6 +95,73 @@ for i in range(len(needed)):
             neededAndCheapest.append(cheapest[j])
             neededAndCheapest[i].append(needed[i][1])
 
-print(neededAndCheapest)
+for i in range(len(neededAndCheapest)):
+    costs.append([])
+    costs[i].append(neededAndCheapest[i][1])
+
+for i in range(len((neededAndCheapest))):
+    neededAndCheapest[i][1] = "("+neededAndCheapest[i][1][:3]+")"+" "+neededAndCheapest[i][1][3:6]+" "+neededAndCheapest[i][1][6:10]
+
 
 #- Fifth step is to create the orders.txt file -#
+productName = {}
+supplierName = {}
+products = breakText(products,";")
+suppliers = breakText(suppliers,";")
+totalCost = 0
+
+try:
+    orders = open("orders.txt","x")
+    orders.close()
+    orders = open("orders.txt","w")
+except:
+    orders = open("orders.txt","w")
+
+
+for i in range(len(products)):
+    if len(products[i][1]) > 16:
+        products[i][1] = products[i][1][:16]
+    productName[products[i][0]] = products[i][1]
+
+for i in range(len(suppliers)):
+    supplierName[suppliers[i][0]] = suppliers[i][1]
+
+
+orders.writelines(['+--------------+------------------+--------+----------------+----------+','\n'+'|', ' Product Code ', "|"," Product Name    ",' |'+"Quantity"+"| ", " Supplier     ", " | ", " Cost    ","|  "])
+orders.writelines(["\n","+--------------+------------------+--------+----------------+----------+"])
+for i in range(len(neededAndCheapest)):
+    #if len(productName[neededAndCheapest[i][0]]) > 17:
+    cost = str(round((neededAndCheapest[i][2] * neededAndCheapest[i][3]), 2))
+    costs[i].insert(0,float(cost))
+    costs[i].append(neededAndCheapest[i][1])
+    totalCost += (neededAndCheapest[i][2] * neededAndCheapest[i][3])
+    if len(cost) < 5:
+        cost = cost + "0"
+
+    orders.writelines(["\n","|  ", neededAndCheapest[i][0],"   |  ", productName[neededAndCheapest[i][0]],"|     ",str(neededAndCheapest[i][3])," | ", neededAndCheapest[i][1]," | ","$ ",cost.rjust(6), " |"])
+
+orders.writelines(["\n","+--------------+------------------+--------+----------------+----------+"])
+orders.writelines(["\n","| ","Total Cost","   |         ","      $   ",str(round(totalCost,2))+"  |"])
+orders.writelines(["\n","+--------------+---------------------------+"])
+
+highestCost = []
+highestCostSuppliers = []
+costs.sort(reverse=True)
+
+for i in range(1):
+    for j in range(len(costs)):
+        if costs[0] == costs[j]:
+            highestCost.append(costs[j])
+
+for i in range(len(highestCost)):
+    for j in range(len(suppliers)):
+        if highestCost[i][1] in suppliers[j]:
+            highestCostSuppliers.append([])
+            highestCostSuppliers[i].append((suppliers[j][1]))
+            highestCostSuppliers[i].append(highestCost[i][2])
+            highestCostSuppliers[i].append(highestCost[i][0])
+
+for i in range(len(highestCostSuppliers)):
+    orders.writelines(["\n",'Highest cost: ', highestCostSuppliers[i][0]," ", highestCostSuppliers[i][1]," ["+"$"+str(highestCostSuppliers[i][2])+"]"])
+
+orders.close()
