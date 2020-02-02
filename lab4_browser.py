@@ -60,7 +60,7 @@ def goBack(current, pages):
         current -= 1
     else:
         current = 0
-        print("There are no previous websites")
+        print("Cannot go back.")
     return current
 
 
@@ -78,7 +78,7 @@ def goForward(current, pages):
     try:
         pages[current]
     except:
-        print("There are no websites to go forward to")
+        print("Cannot go forward.")
         current = noForward
     return current
 
