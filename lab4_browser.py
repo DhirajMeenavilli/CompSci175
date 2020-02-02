@@ -1,8 +1,11 @@
 # ----------------------------------------------------
 # Lab 4: Web browser simulator
 # Purpose of program: To simulate browsing an internet search engine
-#
+
+# Title: Web Simulation
 # Author:Dhiraj Meenavilli
+# Date: 02/01/2020
+
 # Collaborators/references: N/A
 # ----------------------------------------------------
 
