@@ -6,7 +6,7 @@
 # Collaborators/references:
 # ----------------------------------------------------
 
-from stack import Stack
+#from stack import Stack
 
 def getAction():
     """
@@ -50,6 +50,8 @@ def goBack(current, bck, fwd):
         page = bck.peek()
         bck.pop()
         fwd.push(current)
+        fwd.show()
+        bck.show()
     except:
         page = current
     return page
@@ -66,8 +68,11 @@ def goForward(current, bck, fwd):
     """
     try:
         page = fwd.peek()
+        if current != fwd.peek():
+            bck.push(current)
         fwd.pop()
-        bck.push(current)
+        fwd.show()
+        bck.show()
     except:
         page = current
     return page
