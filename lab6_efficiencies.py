@@ -1,16 +1,16 @@
 #----------------------------------------------------
 # Lab 6, Exercise 2 - Queue efficiencies
-# 
+#
 # Author of supporting code: CMPUT 175 Team
-# Author of dequeue_experiment(): 
+# Author of dequeue_experiment():
 #----------------------------------------------------
 
 import random
 import time
-from queues import BoundedQueue
-from queues import CircularQueue
+#from queues import BoundedQueue
+#from queues import CircularQueue
 from decimal import Decimal
-from terminalplot import plot2
+#from terminalplot import plot2
 
 def enqueue_experiment(queue_class , queue_size ):
     '''
@@ -26,7 +26,6 @@ def enqueue_experiment(queue_class , queue_size ):
     while not queue.is_full():
         value = random.random()
         queue.enqueue(value)
-
     return queue
 
 
@@ -36,12 +35,14 @@ def dequeue_experiment(queue):
     :param queue: (queue object) The queue object that we want to test on
     :return: (float) Returns the time of execution of the dequeue operation
     '''
-    time = 0.0 # the time to dequeue all the elements
+    start = time.time() # the time to dequeue all the elements
     ##### START CODE HERE #####
-
-
+    for i in range(queue.size()):
+        queue.dequeue()
+    finish = time.time()
+    total = finish - start
     #####  END CODE HERE ######
-    return time
+    return total
 
 def avg_dequeue_experiment(queue_class, size, sample_size = 5):
     '''
@@ -94,7 +95,7 @@ def main():
     # plot the terminal graph
     try:
         print('''
-        Legend : 
+        Legend :
         '*' : Points of the Bounded Queue
         '#' : Points of Circular Queue
         '+' : Points where both coincide''')
@@ -122,7 +123,7 @@ def main():
     try:
         # plot the graph
         print('''
-        Legend : 
+        Legend :
         '*' : Points of the Bounded Queue
         '#' : Points of Circular Queue
         '+' : Points where both coincide''')
@@ -138,7 +139,6 @@ if __name__ == '__main__':
     main()
     end = time.time()
     print("The program took {} seconds to run".format(end - start))
-
 
 
 
