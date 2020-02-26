@@ -1,5 +1,4 @@
 import random
-from queues import CircularQueue
 
 class Job:
     def __init__(self, priority = 0, process_name = None):
@@ -67,13 +66,14 @@ def main():
         job = get_job() # get a  job
         if job:
             print("Job {} generated\n".format(job.process_name()))
-
         # Put the job in the appropriate queue
         ########################
         ### ENTER YOUR CODE ####
         ########################
-
-
+            if job.high_priority():
+                high_priority_queue.enqueue(job)
+            else:
+                low_priority_queue.enqueue(job)
         ########################
         ####  END OF CODE ######
         ########################
@@ -96,13 +96,18 @@ def main():
             ########################
             ### ENTER YOUR CODE ####
             ########################
+            if not high_priority_queue.is_empty():
+                current_job = high_priority_queue.dequeue()
+
+            elif not low_priority_queue.is_empty():
+                current_job = low_priority_queue.dequeue()
+
+            if current_job != None:
+                process_running = True
             ## Remove the pass
             ## Check the status of queue , and dequeue the appropriate job
             ## set the job to current_job
             ## set process_running to True if job dequeued
-            pass
-
-
 
             ########################
             ####  END OF CODE ######
