@@ -431,12 +431,14 @@ players = [" Player 1", " Player 2"]
 def rules(board,player):
     if board.isNum():
         valid = False
-        if player % 2 == 0:
+        if player % 2 == 1:
             numDescription = 'even'
+            playerNum = 0
             lowerRange = 2
             upperRange = 8
         else:
             numDescription = 'odd'
+            playerNum = 1
             lowerRange = 1
             upperRange = 9
         prompt = 'Player {}, please enter an {} number ({}-{}): '
@@ -444,7 +446,7 @@ def rules(board,player):
         while not valid:
             val = int(input(prompt))
 
-            if player % 2 != val % 2 or val > upperRange or val < lowerRange:
+            if playerNum % 2 != val % 2 or val > upperRange or val < lowerRange:
                 valid = False
 
             else:
