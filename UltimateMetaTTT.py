@@ -13,7 +13,7 @@ class NumTicTacToe: # This code was pulled from the lab 3 code
         for i in range(self.size):
             row = []
             for j in range(self.size):
-                row.append(" ")
+                row.append(0)
             self.board.append(row)
 
     def drawBoard(self):
@@ -425,10 +425,10 @@ class MetaTicTacToe:
             return board
         elif not self.squareIsEmpty(row,col):
             return None
+marks = ["X","O"]
+players = [" Player 1", " Player 2"]
 
 def rules(board,player):
-    marks = ["X","O"]
-
     if board.isNum():
         valid = False
         if player % 2 == 0:
@@ -440,11 +440,11 @@ def rules(board,player):
             lowerRange = 1
             upperRange = 9
         prompt = 'Player {}, please enter an {} number ({}-{}): '
-        prompt = prompt.format(player, numDescription, lowerRange, upperRange)
+        prompt = prompt.format(players[player%2], numDescription, lowerRange, upperRange)
         while not valid:
             val = int(input(prompt))
 
-            if player % 2 != entry % 2 or entry > upperRange or entry < lowerRange:
+            if player % 2 != val % 2 or val > upperRange or val < lowerRange:
                 valid = False
 
             else:
@@ -457,6 +457,68 @@ def rules(board,player):
         return val
 
 def main():
+    ### ---------------------------------------------------- Code Starts Here -------------------------------------- ###
+    game  = True
+    configFile = 'MetaTTTconfig.txt'
+    mtt = MetaTicTacToe(configFile)
+    metaTurn = 0
+
+    while game:
+        mtt.drawBoard()
+        metaValid = False
+
+        while not metaValid:
+            try:
+                metaRow = int(input('What is the row of the cell you would like to access'+ players[metaTurn%2] + "\n"))
+                metaCol = int(input('What is the column of the cell you would like to access'+players[metaTurn%2] + "\n"))
+                if mtt.squareIsEmpty(metaRow,metaCol):
+                    board = mtt.getLocalBoard(metaRow,metaCol)
+                    metaValid = True
+            except:
+                print("Please enter an appropriate input.\n")
+        ongoing = True
+        board.drawBoard()
+        turn = 0
+        while ongoing:
+            valid = False
+
+            while not valid:
+
+                correct = False
+
+                try:
+
+                    while not correct:
+                        row = int(input('What is the row of the cell you would like to access\n'))
+                        col = int(input('What is the column of the cell you would like to access\n'))
+                        if board.squareIsEmpty(row,col):
+                            val = rules(board,turn)
+                            correct = True
+                        else:
+                            print("That square is not empty please choose another.")
+
+                    board.update(row,col,val)
+                    valid = True
+                except :
+                    print("Please enter an appropriate input.\n")
+
+            board.drawBoard()
+
+            if board.isWinner():
+                mtt.update(metaRow, metaCol, marks[turn % 2])
+                ongoing = False
+
+            if board.boardFull():
+                mtt.update(metaRow, metaCol, "D")
+                ongoing = False
+
+            turn += 1
+        metaTurn += 1
+        if mtt.isWinner():
+            game = False
+
+
+if __name__ == "__main__":
     ### ----------------------------------------------------- Classic and Number Tic Tac Toe Board Tests ------------------------------------------------- ###
     """
     # Test 1 - Do the boards intitalize, look how they should, and return the correct boolean for wether they are a number board or not
@@ -587,69 +649,4 @@ def main():
     print("The board is full: ", mtt.boardFull())
     """
 
-    ### ---------------------------------------------------- Code Starts Here -------------------------------------- ###
-
-    game  = True
-    marks = ["X","O"]
-    players = [" Player 1", " Player 2"]
-    configFile = 'MetaTTTconfig.txt'
-    mtt = MetaTicTacToe(configFile)
-    metaTurn = 0
-
-    while game:
-        mtt.drawBoard()
-        metaValid = False
-
-        while not metaValid:
-            try:
-                metaRow = int(input('What is the row of the cell you would like to access'+ players[metaTurn%2] + "\n"))
-                metaCol = int(input('What is the column of the cell you would like to access'+players[metaTurn%2] + "\n"))
-                if mtt.squareIsEmpty(metaRow,metaCol):
-                    board = mtt.getLocalBoard(metaRow,metaCol)
-                    metaValid = True
-            except:
-                print("Please enter an appropriate input.\n")
-        ongoing = True
-        board.drawBoard()
-        turn = 0
-        while ongoing:
-            valid = False
-
-            while not valid:
-
-                correct = False
-
-                try:
-
-                    while not correct:
-                        row = int(input('What is the row of the cell you would like to access\n'))
-                        col = int(input('What is the column of the cell you would like to access\n'))
-                        if board.squareIsEmpty(row,col):
-                            val = rules(board,turn)
-                            correct = True
-                        else:
-                            print("That square is not empty please choose another.")
-
-                    board.update(row,col,val)
-                    valid = True
-                except:
-                    print("Please enter an appropriate input.\n")
-
-            board.drawBoard()
-
-            if board.isWinner():
-                mtt.update(metaRow, metaCol, marks[turn % 2])
-                ongoing = False
-
-            if board.boardFull():
-                mtt.update(metaRow, metaCol, "D")
-                ongoing = False
-
-            turn += 1
-        metaTurn += 1
-        if mtt.isWinner():
-            game = False
-
-
-if __name__ == "__main__":
     main()
