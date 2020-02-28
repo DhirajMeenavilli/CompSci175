@@ -1,7 +1,7 @@
 # ----------------------------------------------------
 # Assignment 2: Tic Tac Toe classes
 #
-# Author:Dhiraj Meenavilli
+# Author: Dhiraj Meenavilli
 # References: Lab 3
 # ----------------------------------------------------
 
@@ -591,18 +591,19 @@ def main():
 
     game  = True
     marks = ["X","O"]
+    players = [" Player 1", " Player 2"]
     configFile = 'MetaTTTconfig.txt'
     mtt = MetaTicTacToe(configFile)
+    metaTurn = 0
 
     while game:
         mtt.drawBoard()
-        metaTurn = 0
         metaValid = False
 
         while not metaValid:
             try:
-                metaRow = int(input('What is the row of the cell you would like to access\n'))
-                metaCol = int(input('What is the column of the cell you would like to access\n'))
+                metaRow = int(input('What is the row of the cell you would like to access'+ players[metaTurn%2] + "\n"))
+                metaCol = int(input('What is the column of the cell you would like to access'+players[metaTurn%2] + "\n"))
                 if mtt.squareIsEmpty(metaRow,metaCol):
                     board = mtt.getLocalBoard(metaRow,metaCol)
                     metaValid = True
@@ -645,7 +646,7 @@ def main():
                 ongoing = False
 
             turn += 1
-
+        metaTurn += 1
         if mtt.isWinner():
             game = False
 
