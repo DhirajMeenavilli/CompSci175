@@ -64,10 +64,9 @@ class SLinkedList:
             new_node = SLinkedListNode(item,None)
             for i in range(pos-1):
                 current = current.getNext()
-            print(current.getData())
-            print(new_node.getData())
             new_node.setNext(current.getNext())
             current.setNext(new_node)
+            self.size += 1
 
     def remove(self, item):
         # remove the node containing the item from the list
@@ -165,4 +164,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
