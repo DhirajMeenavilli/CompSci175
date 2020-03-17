@@ -73,7 +73,7 @@ def binary_search2(key,lis,low,high):
             return guess
 
     if not inList:
-        return -1
+        return "Item not in list"
 
 def main():
     # Excercise 1
