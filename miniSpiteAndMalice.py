@@ -253,7 +253,7 @@ while game:
             handRemoved = False
             discardRemoved = False
             pileRemoved = False # Each of these when removed from need to be added back to separately therefore I created a simple way to discern which action needs to be taken
-            
+
             for i in range(len(gamePiles)):
                 if gamePiles[i].size() == 0 and player1.checkZero() > -1: # this is just checking if the user has a zero and if any of the game piles are empty
                     card = player1.specPop(player1.checkZero()) # if both are true then the player is forced to play their card
@@ -292,9 +292,9 @@ while game:
                     playTo = input("\nWhich Discard Pile are you targeting (1..4)?")
                     card = player1.pop()
                     handRemoved = True # In case a 0 is in fact removed the assertion will catch and the card will be added back.
-                    
+
                     assert card.getValue() != 0, "You are not allowed to discard a card with value 0."
-                    
+
                     player1DiscardPiles[int(playTo) - 1].add(card)
 
                     placing = False
@@ -319,60 +319,101 @@ while game:
                 print(args)
 
 
-        for i in range(len(gamePiles)):
-            print("Pile", i, gamePiles[i]) # need to be deleted
-
-        for i in range(len(player1DiscardPiles)):
-            print("Discard", i, player1DiscardPiles[i])
-
         turns += 1
 
         player1Turn = False
         player2Turn = True # This simply alternates the turns
 
     while player2Turn:
-        print("h")
-        if turns == 2:
+        if turns == 2:  # If both players have had a turn then the round is done
             player1Turn = False
             player2Turn = False
 
-        """
-        print("Player 1 Hand:",player1,"\nPlayer 1 Discard 1:",player1FirstDiscardPile,"\nPlayer 1 Discard 2:",player1SecondDiscardPile,
-              "\nPlayer 1 Discard 3:",player1ThirdDiscardPile,"\nPlayer 1 Discard 4:",player1FourthDiscardPile,
-              "\nPlayer 1 Goal Pile", goalPile1.peekFace(),goalPile1.size(),"cards left","\n\nPlay Stack 1:", gamePile1,"\nPlay Stack 2:",
-              gamePile2,"\nPlay Stack 3:", gamePile3,"\nPlay Stack 4:", gamePile4,"\n\nPlayer 2 Hand:", player2, "\nPlayer 2 Discard 1:",
-              player2FirstDiscardPile,"\nPlayer 2 Discard 2:",player2SecondDiscardPile, "\nPlayer 2 Discard 3:",player2ThirdDiscardPile,
-              "\nPlayer 2 Discard 4:",player2FourthDiscardPile,"\nPlayer 2 Goal Pile",goalPile2.peekFace(), goalPile2.size(),"cards left")
+        print("Player 1 Hand:", player1, "\nPlayer 1 Discard 1:", player1FirstDiscardPile, "\nPlayer 1 Discard 2:",
+              player1SecondDiscardPile,
+              "\nPlayer 1 Discard 3:", player1ThirdDiscardPile, "\nPlayer 1 Discard 4:", player1FourthDiscardPile,
+              "\nPlayer 1 Goal Pile", goalPile1.peekFace(), goalPile1.size(), "cards left", "\n\nPlay Stack 1:",
+              gamePile1, "\nPlay Stack 2:",
+              gamePile2, "\nPlay Stack 3:", gamePile3, "\nPlay Stack 4:", gamePile4, "\n\nPlayer 2 Hand:", player2,
+              "\nPlayer 2 Discard 1:",
+              player2FirstDiscardPile, "\nPlayer 2 Discard 2:", player2SecondDiscardPile, "\nPlayer 2 Discard 3:",
+              player2ThirdDiscardPile,
+              "\nPlayer 2 Discard 4:", player2FourthDiscardPile, "\nPlayer 2 Goal Pile", goalPile2.peekFace(),
+              goalPile2.size(), "cards left")
 
-        play = input("\nPlayer 2 choose action p (play) or x (discard/end turn) ").lower()
+        placing = True 
 
-        if play[0] == "p":
-            playFrom = list(input("\nPlay from where: hi = hand at position i (1..5); g = goal; dj = discard pile j (1..4)?"))
+        while placing:
+            play = input("\nPlayer 2 choose action p (play) or x (discard/end turn) ").lower()
 
-            if playFrom[0] == "h":
-                card = player2.specPop(int(playFrom[1]) - 1)
+            handRemoved = False
+            discardRemoved = False
+            pileRemoved = False  
 
-            elif playFrom[0] == "g":
-                card = goalPile2.pop()
+            for i in range(len(gamePiles)):
+                if gamePiles[i].size() == 0 and player2.checkZero() > -1:  
+                    card = player2.specPop(player2.checkZero()) 
+                    gamePiles[i].playCard(card) 
+            try:
+                if play[0] == "p":
+                    playFrom = list(input("\nPlay from where: hi = hand at position i (1..5); g = goal; dj = discard pile j (1..4)?"))
 
-            elif playFrom[0] == "d":
-                card = player2DiscardPiles[int(playFrom[1]) - 1].pop()
+                    assert playFrom[0] == "h" or playFrom[0] == "g" or playFrom[0] == "d", "You have picked an invalid place to play from"  
 
-            playTo = input("\nWhich Play Stack are you targeting (1..4)?")
-            gamePiles[int(playTo) - 1].playCard(card)
+                    if playFrom[0] == "h":
+                        card = player2.specPop(int(playFrom[1]) - 1)
+                        handRemoved = True
 
-        if play[0] == "x":
-            playTo = input("\nWhich Discard Pile are you targeting (1..4)?")
+                    elif playFrom[0] == "g":
+                        card = goalPile2.pop()
+                        pileRemoved = True
 
-            player2DiscardPiles[int(playTo) - 1].add(player2.pop())
+                    elif playFrom[0] == "d":
+                        card = player2DiscardPiles[int(playFrom[1]) - 1].pop()
+                        discardRemoved = True
 
+                    playTo = input("\nWhich Play Stack are you targeting (1..4)?")
 
-        for i in range(len(gamePiles)):
-            print("Pile",i,gamePiles[i])
+                    assert int(playTo) > 0 and int(playTo) < 5, "You have picked an invalid pile to play to."
 
-        for i in range(len(player2DiscardPiles)):
-            print("Discard",i,player2DiscardPiles[i])
-    """
+                    if card.getFace() == "*":
+                        if gamePiles[int(playTo) - 1].size() == 0:
+                            card.assign(0)
+                        else:
+                            card.assign(gamePiles[int(playTo) - 1].peekValue() + 1)
+
+                    gamePiles[int(playTo) - 1].playCard(card)
+
+                if play[0] == "x":
+                    playTo = input("\nWhich Discard Pile are you targeting (1..4)?")
+                    card = player2.pop()
+                    handRemoved = True  # In case a 0 is in fact removed the assertion will catch and the card will be added back.
+
+                    assert card.getValue() != 0, "You are not allowed to discard a card with value 0."
+
+                    player2DiscardPiles[int(playTo) - 1].add(card)
+
+                    placing = False
+
+            except AssertionError as args:
+                if handRemoved:
+                    player2.add([card])
+                    player2.sort()
+
+                if pileRemoved:
+                    goalPile2.add(card)
+
+                if discardRemoved:
+                    player2DiscardPiles[int(playFrom[1]) - 1].add(card)
+
+                print(args)  # This allows me to tell the user what the issue was if I was able to catch it.
+
+            except IndexError as args:
+                print(args)
+
+            except Exception as args:
+                print(args)
+                
         turns += 1
 
         player2Turn = False
@@ -387,7 +428,7 @@ while game:
     player1.add(set1)
     player2.add(set2)
 
-    if goalPile1.size() == 0 or goalPile2.size() ==0:
+    if goalPile1.size() == 0 or goalPile2.size() ==0:# If the goal state of a player having no more cards in their goal pile is met the game is finished
         if goalPile1.size() == 0:
             print("Congratulations Player 1 you have won")
         else:
