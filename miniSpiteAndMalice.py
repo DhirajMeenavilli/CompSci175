@@ -1,5 +1,5 @@
 """
-Date: March/19/2020
+Date: March/21/2020
 Authour: Dhiraj Meenavilli
 Title: Mini Spite and Malice
 """
@@ -20,7 +20,7 @@ class Card():
         return self.__val
 
     def getFace(self):
-        return self.__face
+        return self.__str__()
 
     def __str__(self):
         s = "["
@@ -34,24 +34,31 @@ class Card():
 
 
 class playStack():
-    def __init__(self, cards=None):
+    def __init__(self, cards=[]):
         self.__cards = cards
 
     def peekValue(self):
-        if self.__cards == None or self.__cards == []:
+        if self.__cards == []:
             raise Exception("The stack is empty so there are no cards to look at.")
-        return self.__cards[0].getValue()
+        return self.__cards[len(self.__cards)-1].getValue()
 
     def peekFace(self):
-        if self.__cards == None or self.__cards == []:
+        if self.__cards == []:
             raise Exception("The stack is empty so there are no cards to look at.")
-        return self.__cards[0].getFace()
+        return self.__cards[len(self.__cards)-1].getFace()
 
     def playCard(self,card=None):
-        stackEmpty = False
-        if self.__cards == [] or self.__cards == None:
-            self.__cards.append(Card("0",0))
-            stackEmpty = True
+        stackEmpty = True
+
+        if self.__cards != []:
+            stackEmpty = False
+
+        if stackEmpty:
+            assert card.getValue() == 0, "This stack is empty only zero is allowed to go here."
+
+        if card.getValue() == 0:
+            if self.__cards == []:
+                self.__cards.append(Card("0",0))
 
         if stackEmpty != True:
             if card.getValue() == self.__cards[len(self.__cards)-1].getValue() + 1:
@@ -65,7 +72,16 @@ class playStack():
                 self.__cards = []
 
             else:
-                print("[]")
+                return []
+
+    def add(self,card):
+        self.__cards.append(card)
+
+    def pop(self):
+        return self.__cards.pop()
+
+    def size(self):
+        return len(self.__cards)
 
     def __str__(self):
         cards = []
@@ -80,7 +96,7 @@ class playStack():
         return s
 
 class Hand():
-    def __init__(self,hand):
+    def __init__(self,hand=[]):
         self.__hand = hand
 
     def sort(self):
@@ -141,3 +157,239 @@ def shuffle(cards):
         result.append(cards.pop(random.randrange(0,len(cards))))
 
     return result
+
+############################################### --- Code Starts Here --- ###############################################
+
+cardShoe = []
+
+cards1 = []
+cards2 = []
+
+pile1 = []
+pile2 = []
+
+for i in range(10):
+    for j in range(10):
+        cardShoe.append(Card(str(j),j))
+
+for i in range(20):
+    cardShoe.append(Card('*',-1))
+
+cardShoe = shuffle(cardShoe) # Deck gets shuffled
+
+for i in range(5): # This is simmilar to how cards are dealt in alternating ways
+    cards1.append(cardShoe.pop())
+    cards2.append(cardShoe.pop())
+
+for i in range(15):
+    pile1.append(cardShoe.pop())
+    pile2.append(cardShoe.pop())
+
+player1 = Hand(cards1)
+goalPile1 = playStack(pile1)
+player2 = Hand(cards2)
+goalPile2 = playStack(pile2)
+
+player1FirstDiscardPile = playStack([])
+player1SecondDiscardPile = playStack([])
+player1ThirdDiscardPile = playStack([])
+player1FourthDiscardPile = playStack([])
+
+player1DiscardPiles = [player1FirstDiscardPile,player1SecondDiscardPile,player1ThirdDiscardPile,player1FourthDiscardPile]
+
+player2FirstDiscardPile = playStack([])
+player2SecondDiscardPile = playStack([])
+player2ThirdDiscardPile = playStack([])
+player2FourthDiscardPile = playStack([])
+
+player2DiscardPiles = [player2FirstDiscardPile,player2SecondDiscardPile,player2ThirdDiscardPile,player2FourthDiscardPile]
+
+gamePile1 = playStack([])
+gamePile2 = playStack([])
+gamePile3 = playStack([])
+gamePile4 = playStack([])
+
+gamePiles = [gamePile1,gamePile2,gamePile3,gamePile4]
+
+game = True
+
+while game:
+    player1Turn = False
+    player2Turn = False
+    set1 = [] # Sets are cleared so they can be added to later
+    set2 = []
+    turns = 0
+    player1.sort()  # Players hands are sorted
+    player2.sort()
+
+
+    if goalPile2.peekValue() > goalPile1.peekValue():
+        player2Turn = True
+
+    else: # Because in any situation ther then player 2 having a higher value on top of the stack player1 goes first
+        player1Turn = True
+
+    print(goalPile1.peekFace())
+
+
+
+    while player1Turn:
+        if turns == 2: # If both players have had a turn then the round is done
+            player1Turn = False
+            player2Turn = False
+
+        print("Player 1 Hand:",player1,"\nPlayer 1 Discard 1:",player1FirstDiscardPile,"\nPlayer 1 Discard 2:",player1SecondDiscardPile,
+              "\nPlayer 1 Discard 3:",player1ThirdDiscardPile,"\nPlayer 1 Discard 4:",player1FourthDiscardPile,
+              "\nPlayer 1 Goal Pile", goalPile1.peekFace(),goalPile1.size(),"cards left","\n\nPlay Stack 1:", gamePile1,"\nPlay Stack 2:",
+              gamePile2,"\nPlay Stack 3:", gamePile3,"\nPlay Stack 4:", gamePile4,"\n\nPlayer 2 Hand:", player2, "\nPlayer 2 Discard 1:",
+              player2FirstDiscardPile,"\nPlayer 2 Discard 2:",player2SecondDiscardPile, "\nPlayer 2 Discard 3:",player2ThirdDiscardPile,
+              "\nPlayer 2 Discard 4:",player2FourthDiscardPile,"\nPlayer 2 Goal Pile",goalPile2.peekFace(), goalPile2.size(),"cards left")
+
+        placing = True # this variable exists to create a state in which the user can keep playing until they have n legal moves left
+
+        while placing:
+            play = input("\nPlayer 1 choose action p (play) or x (discard/end turn) ").lower()
+
+            handRemoved = False
+            discardRemoved = False
+            pileRemoved = False # Each of these when removed from need to be added back to separately therefore I created a simple way to discern which action needs to be taken
+            
+            for i in range(len(gamePiles)):
+                if gamePiles[i].size() == 0 and player1.checkZero() > -1: # this is just checking if the user has a zero and if any of the game piles are empty
+                    card = player1.specPop(player1.checkZero()) # if both are true then the player is forced to play their card
+                    gamePiles[i].playCard(card) # The game pile which was first empty will recieve this 0 and be opened.
+            try:
+                if play[0] == "p":
+                    playFrom = list(input("\nPlay from where: hi = hand at position i (1..5); g = goal; dj = discard pile j (1..4)?"))
+
+                    assert playFrom[0] == "h" or playFrom[0] == "g" or playFrom[0] == "d", "You have picked an invalid place to play from" # So that if the user hits a different key there's no issues
+
+                    if playFrom[0] == "h":
+                        card = player1.specPop(int(playFrom[1])-1)
+                        handRemoved = True
+
+                    elif playFrom[0] == "g":
+                        card = goalPile1.pop()
+                        pileRemoved = True
+
+                    elif playFrom[0] == "d":
+                        card = player1DiscardPiles[int(playFrom[1])-1].pop()
+                        discardRemoved = True
+
+                    playTo = input("\nWhich Play Stack are you targeting (1..4)?")
+
+                    assert int(playTo) > 0 and int(playTo) < 5, "You have picked an invalid pile to play to."
+
+                    if card.getFace() == "*":
+                        if gamePiles[int(playTo) - 1].size() == 0:
+                            card.assign(0)
+                        else:
+                            card.assign(gamePiles[int(playTo) - 1].peekValue() + 1)
+
+                    gamePiles[int(playTo)-1].playCard(card)
+
+                if play[0] == "x":
+                    playTo = input("\nWhich Discard Pile are you targeting (1..4)?")
+                    card = player1.pop()
+                    handRemoved = True # In case a 0 is in fact removed the assertion will catch and the card will be added back.
+                    
+                    assert card.getValue() != 0, "You are not allowed to discard a card with value 0."
+                    
+                    player1DiscardPiles[int(playTo) - 1].add(card)
+
+                    placing = False
+
+            except AssertionError as args:
+                if handRemoved:
+                    player1.add([card])
+                    player1.sort()
+
+                if pileRemoved:
+                    goalPile1.add(card)
+
+                if discardRemoved:
+                    player1DiscardPiles[int(playFrom[1]) - 1].add(card)
+
+                print(args) # This allows me to tell the user what the issue was if I was able to catch it.
+
+            except IndexError as args:
+                print(args)
+
+            except Exception as args:
+                print(args)
+
+
+        for i in range(len(gamePiles)):
+            print("Pile", i, gamePiles[i]) # need to be deleted
+
+        for i in range(len(player1DiscardPiles)):
+            print("Discard", i, player1DiscardPiles[i])
+
+        turns += 1
+
+        player1Turn = False
+        player2Turn = True # This simply alternates the turns
+
+    while player2Turn:
+        print("h")
+        if turns == 2:
+            player1Turn = False
+            player2Turn = False
+
+        """
+        print("Player 1 Hand:",player1,"\nPlayer 1 Discard 1:",player1FirstDiscardPile,"\nPlayer 1 Discard 2:",player1SecondDiscardPile,
+              "\nPlayer 1 Discard 3:",player1ThirdDiscardPile,"\nPlayer 1 Discard 4:",player1FourthDiscardPile,
+              "\nPlayer 1 Goal Pile", goalPile1.peekFace(),goalPile1.size(),"cards left","\n\nPlay Stack 1:", gamePile1,"\nPlay Stack 2:",
+              gamePile2,"\nPlay Stack 3:", gamePile3,"\nPlay Stack 4:", gamePile4,"\n\nPlayer 2 Hand:", player2, "\nPlayer 2 Discard 1:",
+              player2FirstDiscardPile,"\nPlayer 2 Discard 2:",player2SecondDiscardPile, "\nPlayer 2 Discard 3:",player2ThirdDiscardPile,
+              "\nPlayer 2 Discard 4:",player2FourthDiscardPile,"\nPlayer 2 Goal Pile",goalPile2.peekFace(), goalPile2.size(),"cards left")
+
+        play = input("\nPlayer 2 choose action p (play) or x (discard/end turn) ").lower()
+
+        if play[0] == "p":
+            playFrom = list(input("\nPlay from where: hi = hand at position i (1..5); g = goal; dj = discard pile j (1..4)?"))
+
+            if playFrom[0] == "h":
+                card = player2.specPop(int(playFrom[1]) - 1)
+
+            elif playFrom[0] == "g":
+                card = goalPile2.pop()
+
+            elif playFrom[0] == "d":
+                card = player2DiscardPiles[int(playFrom[1]) - 1].pop()
+
+            playTo = input("\nWhich Play Stack are you targeting (1..4)?")
+            gamePiles[int(playTo) - 1].playCard(card)
+
+        if play[0] == "x":
+            playTo = input("\nWhich Discard Pile are you targeting (1..4)?")
+
+            player2DiscardPiles[int(playTo) - 1].add(player2.pop())
+
+
+        for i in range(len(gamePiles)):
+            print("Pile",i,gamePiles[i])
+
+        for i in range(len(player2DiscardPiles)):
+            print("Discard",i,player2DiscardPiles[i])
+    """
+        turns += 1
+
+        player2Turn = False
+        player1Turn = True
+
+    for i in range(5 - player1.size()): # This deals cards to the hand so that the user will always have 5 in hand
+       set1.append(cardShoe.pop())
+
+    for i in range(5 - player2.size()):
+        set2.append(cardShoe.pop())
+
+    player1.add(set1)
+    player2.add(set2)
+
+    if goalPile1.size() == 0 or goalPile2.size() ==0:
+        if goalPile1.size() == 0:
+            print("Congratulations Player 1 you have won")
+        else:
+            print("Congratulations Player 2 you have won")
+        game = False
